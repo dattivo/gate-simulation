@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>2D Visualization of Discrete Event Simulations</title>
+        <style>
+            html, body { font-family: "sans-serif"; margin: 0; padding: 0; background: #555; }
+
+            .header { background: #fefefe; height: 75px; top: 0; left: 0; right: 0; border-bottom: 1px solid #333; margin-bottom: 10px; padding: 1rem; }
+            .header h4 { margin: 0; padding: 0; }
+            .header input { height: 20px; }
+
+            .canvas-container { text-align: center; margin: auto; }
+            canvas { border: 1px solid #111; background: #fefefe; }
+
+            .logo-img { position: fixed; bottom: 1rem; right: 1rem; height: 40px; }
+        </style>
+    <body>
+        <div class="header">
+            <h4>Discrete Event Simulation</h4>
+            <select name="file" id="file">
+                <option value="output/four-sellers-two-scanners.json">6 sellers, 4 scanners</option>
+                <option value="output/six-sellers-four-scanners.json">6 sellers, 4 scanners</option>
+                <option value="output/ten-sellers-five-scanners.json">10 sellers, 5 scanners</option>
+                <option value="output/six-sellers-four-scanners-one-line.json">6 sellers, 4 scanners with one queue each</option>
+            </select>
+            <label>Simulation Speed:</label>
+            <input type="number" min="1" max="100" step="1" name="speed" id="speed" value="2" />
+            <button type="button" id="goButton">Run</button>
+            <br/><small>Speed unit is "Actual seconds per simulated minute"</small>
+        </div>
+        <div class="canvas-container">
+            <canvas id="animate" width="1100" height="800"></canvas>
+        </div>
+        <img src="images/LogoDattivo.png" class="logo-img" />
+        <script src="visualize.js"></script>
+    </body>
+</html>

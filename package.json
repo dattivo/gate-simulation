@@ -1,0 +1,15 @@
+{
+    "name": "gate-simulation",
+    "version": "1.0.0",
+    "description": "",
+    "main": "visualize.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Dattivo Software Inc.",
+    "prettier": {
+        "tabWidth": 4,
+        "useTabs": false,
+        "printWidth": 150
+    }
+}
