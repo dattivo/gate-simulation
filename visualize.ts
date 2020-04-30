@@ -1,3 +1,5 @@
+const goButton = document.getElementById("goButton") as HTMLButtonElement;
+
 const personIcon = new Image();
 personIcon.src = "images/person-icon.png";
 const IMAGE_WIDTH = 25;
@@ -113,7 +115,7 @@ class Queue {
 }
 
 class Person {
-    static START_AT: Coords = { x: 5, y: 400 };
+    static START_AT: Coords = { x: 100, y: 700 };
     static GROUP_SPACING = 6;
 
     private events: Array<SimEvent> = [];
@@ -226,6 +228,7 @@ class Person {
 //  CANVAS LOGIC
 // -------------------------
 
+let stopTriggered = false;
 const Run = async (sourceFile: string, speed: number) => {
     const canvas = document.getElementById("animate") as HTMLCanvasElement;
     const ctx = canvas.getContext("2d");
@@ -279,14 +282,25 @@ const Run = async (sourceFile: string, speed: number) => {
 
         ctx.fillText(`T = ${now.toFixed(2)} minutes`, 5, 15);
 
-        window.requestAnimationFrame(Draw);
+        if (now < 30 && !stopTriggered) {
+            window.requestAnimationFrame(Draw);
+        } else {
+            goButton.textContent = "Start";
+            stopTriggered = false;
+        }
     };
 
     window.requestAnimationFrame(Draw);
 };
 
-document.getElementById("goButton")?.addEventListener("click", () => {
-    const file = (document.getElementById("file") as HTMLSelectElement).value;
-    const speed = parseInt((document.getElementById("speed") as HTMLInputElement).value, 10);
-    Run(file, speed);
+goButton.addEventListener("click", function() {
+    if (this.textContent === "Start") {
+        this.textContent = "Stop";
+        const file = (document.getElementById("file") as HTMLSelectElement).value;
+        const speed = parseInt((document.getElementById("speed") as HTMLInputElement).value, 10);
+        Run(file, speed);
+    } else {
+        this.textContent = "Start";
+        stopTriggered = true;
+    }
 });

@@ -29,8 +29,6 @@ from PIL import ImageTk
 #  CONFIGURATION
 # -------------------------
 
-RANDOM_SEED = 42
-
 BUS_ARRIVAL_MEAN = 3
 BUS_OCCUPANCY_MEAN = 100
 BUS_OCCUPANCY_STD = 30
@@ -53,6 +51,12 @@ SCANNER_LINES = 4
 SCANNERS_PER_LINE = 1
 SCANNER_MEAN = 1 / 20
 SCANNER_STD = 0.01
+
+# Let's pre-generate all the bus arrival times and their occupancies so that even if we
+# change the configuration, we'll have consistent arrivals
+random.seed(42)
+ARRIVALS = [ random.expovariate(1 / BUS_ARRIVAL_MEAN) for _ in range(40) ]
+ON_BOARD = [ int(random.gauss(BUS_OCCUPANCY_MEAN, BUS_OCCUPANCY_STD)) for _ in range(40) ]
 
 # -------------------------
 #  ANALYTICAL GLOBALS
@@ -252,12 +256,12 @@ class ClockAndData:
         
         a1.cla()
         a1.set_xlabel("Time")
-        a1.set_ylabel("Avg. Seller Wait")
+        a1.set_ylabel("Avg. Seller Wait (minutes)")
         a1.step([ t for (t, waits) in seller_waits.items() ], [ np.mean(waits) for (t, waits) in seller_waits.items() ])
         
         a2.cla()
         a2.set_xlabel("Time")
-        a2.set_ylabel("Avg. Scanner Wait")
+        a2.set_ylabel("Avg. Scanner Wait (minutes)")
         a2.step([ t for (t, waits) in scan_waits.items() ], [ np.mean(waits) for (t, waits) in scan_waits.items() ])
         
         a3.cla()
@@ -307,7 +311,7 @@ def create_clock(env):
 def bus_arrival(env, seller_lines, scanner_lines):
     """
         Simulate a bus arriving every BUS_ARRIVAL_MEAN minutes with 
-        BUS_ARRIVAL_MEAN people on board
+        BUS_OCCUPANCY_MEAN people on board
 
         This is the top-level SimPy event for the simulation: all other events
         originate from a bus arriving
@@ -316,8 +320,10 @@ def bus_arrival(env, seller_lines, scanner_lines):
     next_bus_id = 0
     next_person_id = 0
     while True:
-        next_bus = random.expovariate(1 / BUS_ARRIVAL_MEAN)        
-        on_board = int(random.gauss(BUS_OCCUPANCY_MEAN, BUS_OCCUPANCY_STD))        
+        # next_bus = random.expovariate(1 / BUS_ARRIVAL_MEAN)        
+        # on_board = int(random.gauss(BUS_OCCUPANCY_MEAN, BUS_OCCUPANCY_STD))        
+        next_bus = ARRIVALS.pop()
+        on_board = ON_BOARD.pop()
         
         # Wait for the bus 
         bus_log.next_bus(next_bus)
@@ -389,9 +395,8 @@ def scanning_customer(env, people_processed, scanner_lines, walk_duration, walk_
             register_visitor_moving_to_scanner(person, walk_begin, walk_end, scanner_line[1], queue_begin, queue_end, scan_begin, scan_end)
 
 
-random.seed(42)
-env = simpy.rt.RealtimeEnvironment(factor = 0.01, strict = False)
-#env = simpy.Environment()
+#env = simpy.rt.RealtimeEnvironment(factor = 0.01, strict = False)
+env = simpy.Environment()
 
 seller_lines = [ simpy.Resource(env, capacity = SELLERS_PER_LINE) for _ in range(SELLER_LINES) ]
 scanner_lines = [ simpy.Resource(env, capacity = SCANNERS_PER_LINE) for _ in range(SCANNER_LINES) ]

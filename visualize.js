@@ -34,8 +34,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _a;
 var _this = this;
+var goButton = document.getElementById("goButton");
 var personIcon = new Image();
 personIcon.src = "images/person-icon.png";
 var IMAGE_WIDTH = 25;
@@ -212,13 +212,14 @@ var Person = /** @class */ (function () {
                 console.warn("Unknown event: " + topEvent.event);
         }
     };
-    Person.START_AT = { x: 5, y: 400 };
+    Person.START_AT = { x: 100, y: 700 };
     Person.GROUP_SPACING = 6;
     return Person;
 }());
 // -------------------------
 //  CANVAS LOGIC
 // -------------------------
+var stopTriggered = false;
 var Run = function (sourceFile, speed) { return __awaiter(_this, void 0, void 0, function () {
     var canvas, ctx, data, events, sellerQueues, scannerQueues, personMap, begin, Draw;
     return __generator(this, function (_a) {
@@ -271,16 +272,29 @@ var Run = function (sourceFile, speed) { return __awaiter(_this, void 0, void 0,
                     scannerQueues.forEach(function (q) { return q.draw(ctx, now); });
                     Object.keys(personMap).forEach(function (id) { return personMap[id].draw(ctx, now); });
                     ctx.fillText("T = " + now.toFixed(2) + " minutes", 5, 15);
-                    window.requestAnimationFrame(Draw);
+                    if (now < 30 && !stopTriggered) {
+                        window.requestAnimationFrame(Draw);
+                    }
+                    else {
+                        goButton.textContent = "Start";
+                        stopTriggered = false;
+                    }
                 };
                 window.requestAnimationFrame(Draw);
                 return [2 /*return*/];
         }
     });
 }); };
-(_a = document.getElementById("goButton")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", function () {
-    var file = document.getElementById("file").value;
-    var speed = parseInt(document.getElementById("speed").value, 10);
-    Run(file, speed);
+goButton.addEventListener("click", function () {
+    if (this.textContent === "Start") {
+        this.textContent = "Stop";
+        var file = document.getElementById("file").value;
+        var speed = parseInt(document.getElementById("speed").value, 10);
+        Run(file, speed);
+    }
+    else {
+        this.textContent = "Start";
+        stopTriggered = true;
+    }
 });
 //# sourceMappingURL=visualize.js.map
